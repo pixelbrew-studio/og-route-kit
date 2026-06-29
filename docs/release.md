@@ -7,6 +7,7 @@ This repository is GitHub-first for now. Do not publish to npm until the route k
 - A real app uses `createOgRoute` and `createSocialMetadata` without package-local assumptions.
 - The README quickstart matches the dogfooded route exactly.
 - The example app builds from a clean clone.
+- A clean consumer project can install the package from GitHub by commit or tag.
 - `pnpm run ci` passes.
 - `pnpm pack --dry-run` includes only expected package files.
 - The npm package name is available or controlled by the maintainer.

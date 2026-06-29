@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { ImageResponse } from "next/og";
+import { ImageResponse } from "next/og.js";
 
 import { normalizeOgParams, resolveOgImageSize } from "../core/index.js";
 import type { OgFields, OgImageSizeInput } from "../core/index.js";

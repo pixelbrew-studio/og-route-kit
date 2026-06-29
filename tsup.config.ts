@@ -10,7 +10,7 @@ export default defineConfig({
   },
   clean: true,
   dts: true,
-  external: ["next", "next/og", "react", "react/jsx-runtime"],
+  external: ["next", "next/og.js", "react", "react/jsx-runtime"],
   format: ["esm"],
   shims: true,
   sourcemap: true,

@@ -1,6 +1,6 @@
 # og-route-kit
 
-[![CI](https://github.com/pixelbrew/og-route-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pixelbrew/og-route-kit/actions/workflows/ci.yml)
+[![CI](https://github.com/karel-van-achte/og-route-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/karel-van-achte/og-route-kit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Code-rendered Open Graph image routes for Next.js.
@@ -24,9 +24,31 @@ Experimental and GitHub-first. This package is not published to npm yet. The sca
 
 ## Usage
 
-This package is currently intended for local dogfooding from this repository or as a workspace dependency inside a larger app. Do not depend on a stable npm package yet.
+This package is currently intended for local dogfooding, direct GitHub installs, or as a workspace dependency inside a larger app. Do not depend on a stable npm package yet.
 
-If you want to try it in another local project, build this repo and link it with your package manager or copy the current implementation into that project while the API settles.
+Install from GitHub while the package is not published to npm:
+
+```bash
+pnpm add github:karel-van-achte/og-route-kit
+```
+
+For npm:
+
+```bash
+npm install github:karel-van-achte/og-route-kit
+```
+
+For a private repository, the consuming environment must already be authenticated with GitHub. Once the repository is public, the same GitHub dependency works without private repository credentials. For reproducible app builds, pin the dependency to a commit or tag:
+
+```json
+{
+  "dependencies": {
+    "og-route-kit": "github:karel-van-achte/og-route-kit#<commit-or-tag>"
+  }
+}
+```
+
+GitHub installs run the package `prepare` script and build `dist` from source during installation.
 
 Runtime peer dependencies:
 
