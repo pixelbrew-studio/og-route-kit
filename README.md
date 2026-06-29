@@ -1,6 +1,6 @@
 # og-route-kit
 
-[![CI](https://github.com/karel-van-achte/og-route-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/karel-van-achte/og-route-kit/actions/workflows/ci.yml)
+[![CI](https://github.com/pixelbrew-studio/og-route-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pixelbrew-studio/og-route-kit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Code-rendered Open Graph image routes for Next.js.
@@ -29,13 +29,13 @@ This package is currently intended for local dogfooding, direct GitHub installs,
 Install from GitHub while the package is not published to npm:
 
 ```bash
-pnpm add github:karel-van-achte/og-route-kit
+pnpm add github:pixelbrew-studio/og-route-kit
 ```
 
 For npm:
 
 ```bash
-npm install github:karel-van-achte/og-route-kit
+npm install github:pixelbrew-studio/og-route-kit
 ```
 
 For a private repository, the consuming environment must already be authenticated with GitHub. Once the repository is public, the same GitHub dependency works without private repository credentials. For reproducible app builds, pin the dependency to a commit or tag:
@@ -43,7 +43,7 @@ For a private repository, the consuming environment must already be authenticate
 ```json
 {
   "dependencies": {
-    "og-route-kit": "github:karel-van-achte/og-route-kit#<commit-or-tag>"
+    "og-route-kit": "github:pixelbrew-studio/og-route-kit#<commit-or-tag>"
   }
 }
 ```
