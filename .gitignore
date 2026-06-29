@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.next/
+examples/next-app/.next/
+.context/
+*.tsbuildinfo
+.DS_Store
