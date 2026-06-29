@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { ImageResponse } from "next/og.js";
 
-import { normalizeOgParams, resolveOgImageSize } from "../core/index.js";
-import type { OgFields, OgImageSizeInput } from "../core/index.js";
+import { normalizeOgParams, resolveOgImageSize } from "../core/index";
+import type { OgFields, OgImageSizeInput } from "../core/index";
 
 export type CreateOgRouteOptions<T extends Record<string, string>> = {
   size?: OgImageSizeInput | undefined;

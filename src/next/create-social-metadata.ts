@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { buildOgImageUrl, resolveOgImageSize } from "../core/index.js";
-import type { OgImageSizeInput, OgImageUrlParams } from "../core/index.js";
+import { buildOgImageUrl, resolveOgImageSize } from "../core/index";
+import type { OgImageSizeInput, OgImageUrlParams } from "../core/index";
 
 export type CreateSocialMetadataOptions = {
   siteUrl: string;

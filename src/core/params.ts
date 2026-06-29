@@ -1,5 +1,5 @@
-import type { OgFields } from "./fields.js";
-import { normalizeText } from "./text.js";
+import type { OgFields } from "./fields";
+import { normalizeText } from "./text";
 
 export type OgSearchParamsInput =
   | URLSearchParams

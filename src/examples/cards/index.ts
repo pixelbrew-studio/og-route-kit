@@ -1,6 +1,6 @@
-export { ArticleCard } from "./article-card.js";
-export type { ArticleCardProps } from "./article-card.js";
-export { ChangelogCard } from "./changelog-card.js";
-export type { ChangelogCardProps } from "./changelog-card.js";
-export { ProductCard } from "./product-card.js";
-export type { ProductCardProps } from "./product-card.js";
+export { ArticleCard } from "./article-card";
+export type { ArticleCardProps } from "./article-card";
+export { ChangelogCard } from "./changelog-card";
+export type { ChangelogCardProps } from "./changelog-card";
+export { ProductCard } from "./product-card";
+export type { ProductCardProps } from "./product-card";
