@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./examples/next-app/*"],
+      "og-route-kit": ["./src/index.ts"],
+      "og-route-kit/core": ["./src/core/index.ts"],
+      "og-route-kit/next": ["./src/next/index.ts"],
+      "og-route-kit/examples/cards": ["./src/examples/cards/index.ts"]
+    },
+    "jsx": "react-jsx",
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node", "react"]
+  },
+  "include": ["src", "test", "examples/next-app"],
+  "exclude": ["dist", "node_modules"]
+}

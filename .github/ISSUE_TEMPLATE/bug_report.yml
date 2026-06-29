@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible problem in og-route-kit.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a reproducible issue.
+  - type: input
+    id: version
+    attributes:
+      label: og-route-kit version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: next-version
+    attributes:
+      label: Next.js version
+      placeholder: 15.5.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link to a repo or paste the smallest route/card that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
