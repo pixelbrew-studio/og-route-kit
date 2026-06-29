@@ -4,13 +4,13 @@
   "description": "Code-rendered Open Graph image routes for Next.js.",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://github.com/pixelbrew/og-route-kit#readme",
+  "homepage": "https://github.com/karel-van-achte/og-route-kit#readme",
   "bugs": {
-    "url": "https://github.com/pixelbrew/og-route-kit/issues"
+    "url": "https://github.com/karel-van-achte/og-route-kit/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pixelbrew/og-route-kit.git"
+    "url": "https://github.com/karel-van-achte/og-route-kit.git"
   },
   "packageManager": "pnpm@10.33.4",
   "engines": {
@@ -61,7 +61,8 @@
     "example:build": "pnpm --filter og-route-kit-next-app-example build",
     "lint": "tsc --noEmit",
     "pack:check": "pnpm pack --dry-run",
-    "prepack": "pnpm build",
+    "prepare": "tsup",
+    "prepack": "tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "verify:local": "bash scripts/verify-local.sh"
