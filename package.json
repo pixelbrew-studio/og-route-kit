@@ -64,7 +64,7 @@
     "prepack": "pnpm build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "verify:conductor": "bash scripts/conductor-test.sh"
+    "verify:local": "bash scripts/verify-local.sh"
   },
   "peerDependencies": {
     "next": ">=14.0.0",

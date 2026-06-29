@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PORT="${CONDUCTOR_PORT:-3000}"
+PORT="${PORT:-3000}"
 BASE_URL="http://127.0.0.1:${PORT}"
 OG_URL="${BASE_URL}/api/og?title=Hello&description=World"
 OUT_FILE=".context/og-image-test.png"
-LOG_FILE=".context/conductor-next.log"
+LOG_FILE=".context/local-next.log"
 SERVER_PID=""
 
 cleanup() {
@@ -35,7 +35,7 @@ echo "==> Building Next example"
 pnpm --filter og-route-kit-next-app-example build
 
 if command -v lsof >/dev/null 2>&1 && lsof -nP -iTCP:"${PORT}" -sTCP:LISTEN >/dev/null 2>&1; then
-  echo "Port ${PORT} is already in use. Set CONDUCTOR_PORT to a free port and retry." >&2
+  echo "Port ${PORT} is already in use. Set PORT to a free port and retry." >&2
   exit 1
 fi
 
@@ -75,7 +75,7 @@ file "${OUT_FILE}"
 echo "==> Checking package tarball"
 pnpm pack --dry-run
 
-echo "==> Conductor verification passed"
+echo "==> Local verification passed"
 echo "Route: ${OG_URL}"
 echo "PNG: ${OUT_FILE}"
 echo "Server log: ${LOG_FILE}"

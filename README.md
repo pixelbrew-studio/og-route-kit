@@ -195,13 +195,13 @@ pnpm example:build
 pnpm pack:check
 ```
 
-In Conductor, use the repository Run button or run:
+For a full local route check, run:
 
 ```bash
-pnpm verify:conductor
+pnpm verify:local
 ```
 
-That starts the example app on `$CONDUCTOR_PORT`, checks the OG route, exports a test PNG to `.context/og-image-test.png`, and stops the server.
+That starts the example app, checks the OG route, exports a test PNG to `.context/og-image-test.png`, and stops the server.
 
 ## Contributing
 
