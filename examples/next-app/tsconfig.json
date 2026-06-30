@@ -4,7 +4,11 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "og-route-kit": ["../../dist/index.js"],
+      "og-route-kit/core": ["../../dist/core/index.js"],
+      "og-route-kit/next": ["../../dist/next/index.js"],
+      "og-route-kit/examples/cards": ["../../dist/examples/cards/index.js"]
     },
     "noEmit": true,
     "allowJs": true,
