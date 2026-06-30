@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { buildPreviewUrls, optionalPositiveInteger, parseFlags, requireString } from "../src/cli/args.js";
+
 import { assertPngResponseHeaders, assertPngSignature, fetchPng } from "../src/cli/fetch-png.js";
 
 const PNG_SIGNATURE = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
@@ -204,5 +206,114 @@ describe("fetchPng", () => {
     await fetchPng("https://example.test/og.png", { timeoutMs: 1000 });
     const init = fetchSpy.mock.calls[0]?.[1];
     expect(init?.signal).toBeInstanceOf(AbortSignal);
+  });
+});
+
+describe("CLI args", () => {
+  describe("parseFlags", () => {
+    it("parses key-value pairs", () => {
+      expect(parseFlags(["--url", "x", "--out", "y"])).toEqual({ url: "x", out: "y" });
+    });
+
+    it("treats a lone flag as boolean true", () => {
+      expect(parseFlags(["--verbose"])).toEqual({ verbose: true });
+    });
+
+    it("treats consecutive flags as boolean true", () => {
+      expect(parseFlags(["--a", "--b"])).toEqual({ a: true, b: true });
+    });
+
+    it("ignores non-flag tokens at the start", () => {
+      expect(parseFlags(["export", "--url", "x"])).toEqual({ url: "x" });
+    });
+
+    it("stores a negative number string as a string value", () => {
+      expect(parseFlags(["--max-bytes", "-5"])).toEqual({ "max-bytes": "-5" });
+    });
+  });
+
+  describe("requireString", () => {
+    it("returns the value when present and non-empty", () => {
+      expect(requireString({ url: "https://example.com" }, "url")).toBe("https://example.com");
+    });
+
+    it("throws for a missing key", () => {
+      expect(() => requireString({}, "url")).toThrow(/Missing required flag --url/);
+    });
+
+    it("throws for a boolean true value", () => {
+      expect(() => requireString({ url: true }, "url")).toThrow(/Missing required flag --url/);
+    });
+
+    it("throws for an empty string", () => {
+      expect(() => requireString({ url: "" }, "url")).toThrow(/Missing required flag --url/);
+    });
+  });
+
+  describe("optionalPositiveInteger", () => {
+    it("returns the fallback when the key is absent", () => {
+      expect(optionalPositiveInteger({}, "timeout", 5000)).toBe(5000);
+    });
+
+    it("parses a valid positive integer string", () => {
+      expect(optionalPositiveInteger({ timeout: "10" }, "timeout", 5000)).toBe(10);
+    });
+
+    it("throws for zero", () => {
+      expect(() => optionalPositiveInteger({ timeout: "0" }, "timeout", 5000)).toThrow(
+        /Flag --timeout requires a positive integer/,
+      );
+    });
+
+    it("throws for a negative number string", () => {
+      expect(() => optionalPositiveInteger({ timeout: "-5" }, "timeout", 5000)).toThrow(
+        /Flag --timeout requires a positive integer/,
+      );
+    });
+
+    it("throws for a decimal string", () => {
+      expect(() => optionalPositiveInteger({ timeout: "5.5" }, "timeout", 5000)).toThrow(
+        /Flag --timeout requires a positive integer/,
+      );
+    });
+
+    it("throws for a non-numeric string", () => {
+      expect(() => optionalPositiveInteger({ timeout: "abc" }, "timeout", 5000)).toThrow(
+        /Flag --timeout requires a positive integer/,
+      );
+    });
+
+    it("throws for a boolean true value", () => {
+      expect(() => optionalPositiveInteger({ timeout: true }, "timeout", 5000)).toThrow(
+        /Flag --timeout requires a positive integer/,
+      );
+    });
+  });
+
+  describe("buildPreviewUrls", () => {
+    it("returns 3 lines with default origin and route", () => {
+      const lines = buildPreviewUrls({});
+      expect(lines).toHaveLength(3);
+      expect(lines[0]).toMatch(/^Product: /);
+      expect(lines[1]).toMatch(/^Article: /);
+      expect(lines[2]).toMatch(/^Changelog: /);
+      for (const line of lines) {
+        expect(line).toContain("http://localhost:3000/api/og?");
+      }
+    });
+
+    it("uses the provided origin and trims trailing slashes", () => {
+      const lines = buildPreviewUrls({ origin: "https://x.dev/" });
+      for (const line of lines) {
+        expect(line).toContain("https://x.dev/api/og?");
+      }
+    });
+
+    it("prepends a slash to a route that lacks one", () => {
+      const lines = buildPreviewUrls({ origin: "https://x.dev/", route: "og" });
+      for (const line of lines) {
+        expect(line).toContain("https://x.dev/og?");
+      }
+    });
   });
 });

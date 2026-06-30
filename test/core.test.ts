@@ -130,7 +130,7 @@ describe("buildOgImageUrl", () => {
     );
   });
 
-  it("extends an existing array key without losing prior entries", () => {
+  it("replaces an existing key with the provided array values", () => {
     expect(buildOgImageUrl("/api/og?tag=old", { tag: ["new"] })).toBe("/api/og?tag=new");
   });
 });
