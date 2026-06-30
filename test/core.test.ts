@@ -69,6 +69,15 @@ describe("normalizeOgParams", () => {
     expect(params.title).toHaveLength(DEFAULT_OG_PARAM_MAX);
   });
 
+  it("caps raw query input before whitespace normalization", () => {
+    const oversized = `${"a".repeat(DEFAULT_OG_PARAM_MAX)} b`;
+    const params = normalizeOgParams(new URLSearchParams(`title=${oversized}`), {
+      defaults: { title: "Default title" },
+    });
+
+    expect(params.title).toBe("a".repeat(DEFAULT_OG_PARAM_MAX));
+  });
+
   it("preserves decoded punctuation", () => {
     const params = normalizeOgParams(new URLSearchParams("title=Why+%E2%80%9Cquotes%E2%80%9D+matter%3F"), {
       defaults: {

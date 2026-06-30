@@ -34,11 +34,14 @@ export function normalizeOgParams<T extends Record<string, string>>(
     const field = options.fields?.[key];
     const rawValue = searchParams.get(key);
     const fallback = field?.fallback ?? options.defaults[key] ?? "";
+    const max = resolveMax(field?.max);
     const normalizedValue =
-      rawValue == null ? "" : normalizeText(rawValue, { collapseWhitespace: field?.collapseWhitespace });
+      rawValue == null
+        ? ""
+        : normalizeText(rawValue.slice(0, max), { collapseWhitespace: field?.collapseWhitespace });
 
     if (normalizedValue.length > 0) {
-      output[key] = applyMax(normalizedValue, field?.max);
+      output[key] = applyMax(normalizedValue, max);
       continue;
     }
 
@@ -63,7 +66,15 @@ export function normalizeOgParams<T extends Record<string, string>>(
 }
 
 function applyMax(value: string, max: number | undefined): string {
-  return value.slice(0, typeof max === "number" ? max : DEFAULT_OG_PARAM_MAX);
+  return value.slice(0, resolveMax(max));
+}
+
+function resolveMax(max: number | undefined): number {
+  if (max === undefined) {
+    return DEFAULT_OG_PARAM_MAX;
+  }
+
+  return Number.isSafeInteger(max) && max > 0 ? max : DEFAULT_OG_PARAM_MAX;
 }
 
 function toURLSearchParams(input: OgSearchParamsInput): URLSearchParams {

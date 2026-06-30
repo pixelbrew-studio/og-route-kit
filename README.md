@@ -142,6 +142,8 @@ Print preview URLs:
 npx og-route-kit preview --origin http://localhost:3000 --route /api/og
 ```
 
+`check` and `export` reject non-2xx responses, non-PNG content types, corrupt PNG bodies, responses over `--max-bytes` (default `8000000`), and requests that exceed `--timeout` (default `30000` milliseconds).
+
 ## API
 
 ### `createOgRoute`
@@ -151,6 +153,8 @@ Creates a Next App Router `GET` handler that normalizes search params and return
 ```ts
 import { createOgRoute } from "og-route-kit/next";
 ```
+
+Missing required query fields return `400` with `Cache-Control: no-store`. Successful image responses default to `Cache-Control: public, max-age=0, s-maxage=86400, stale-while-revalidate=604800`; pass `headers` to override that cache policy for your route.
 
 ### `createSocialMetadata`
 

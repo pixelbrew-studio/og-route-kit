@@ -1,4 +1,4 @@
-export { createOgRoute } from "./create-og-route";
+export { createOgRoute, DEFAULT_CACHE_CONTROL } from "./create-og-route";
 export type { CreateOgRouteOptions, OgRouteRequest } from "./create-og-route";
 export { createSocialMetadata } from "./create-social-metadata";
 export type {
