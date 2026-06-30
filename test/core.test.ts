@@ -123,6 +123,36 @@ describe("buildOgImageUrl", () => {
       "/api/og?theme=dark&title=New",
     );
   });
+
+  it("encodes array values as repeated query keys", () => {
+    expect(buildOgImageUrl("/api/og", { tag: ["a", "b", "c"] })).toBe(
+      "/api/og?tag=a&tag=b&tag=c",
+    );
+  });
+
+  it("extends an existing array key without losing prior entries", () => {
+    expect(buildOgImageUrl("/api/og?tag=old", { tag: ["new"] })).toBe("/api/og?tag=new");
+  });
+});
+
+describe("normalizeOgParams — fallback capping", () => {
+  it("applies DEFAULT_OG_PARAM_MAX to a field's fallback when no explicit max is set", () => {
+    const longFallback = "x".repeat(DEFAULT_OG_PARAM_MAX + 10);
+    const params = normalizeOgParams(new URLSearchParams("title="), {
+      defaults: { title: longFallback },
+    });
+
+    expect(params.title).toHaveLength(DEFAULT_OG_PARAM_MAX);
+  });
+
+  it("still honors an explicit field max when capping the fallback", () => {
+    const params = normalizeOgParams(new URLSearchParams("title="), {
+      defaults: { title: "abcdef" },
+      fields: { title: { max: 3 } },
+    });
+
+    expect(params.title).toBe("abc");
+  });
 });
 
 describe("resolveOgImageSize", () => {

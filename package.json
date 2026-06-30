@@ -4,13 +4,13 @@
   "description": "Code-rendered Open Graph image routes for Next.js.",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://github.com/karel-van-achte/og-route-kit#readme",
+  "homepage": "https://github.com/pixelbrew-studio/og-route-kit#readme",
   "bugs": {
-    "url": "https://github.com/karel-van-achte/og-route-kit/issues"
+    "url": "https://github.com/pixelbrew-studio/og-route-kit/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/karel-van-achte/og-route-kit.git"
+    "url": "https://github.com/pixelbrew-studio/og-route-kit.git"
   },
   "packageManager": "pnpm@10.33.4",
   "engines": {
