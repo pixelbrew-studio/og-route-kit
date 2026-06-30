@@ -2,43 +2,45 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
+import { DEFAULT_MAX_BYTES, DEFAULT_TIMEOUT_MS, fetchPng } from "./fetch-png.js";
+
 type Command = "export" | "check" | "preview" | "help";
 
-const args = process.argv.slice(2);
-const command = (args[0] ?? "help") as Command;
-const flags = parseFlags(args.slice(1));
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const command = (args[0] ?? "help") as Command;
+  const flags = parseFlags(args.slice(1));
 
-try {
-  if (command === "export") {
-    await exportImage(flags);
-  } else if (command === "check") {
-    await checkImage(flags);
-  } else if (command === "preview") {
-    preview(flags);
-  } else {
-    help();
+  try {
+    if (command === "export") {
+      await exportImage(flags);
+    } else if (command === "check") {
+      await checkImage(flags);
+    } else if (command === "preview") {
+      preview(flags);
+    } else {
+      help();
+    }
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
   }
-} catch (error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 async function exportImage(flags: Record<string, string | boolean>): Promise<void> {
   const url = requireString(flags, "url");
   const out = requireString(flags, "out");
-  const response = await fetch(url);
+  const maxBytes = optionalPositiveInteger(flags, "max-bytes", DEFAULT_MAX_BYTES);
+  const timeoutMs = optionalPositiveInteger(flags, "timeout", DEFAULT_TIMEOUT_MS);
 
-  if (!response.ok) {
-    throw new Error(`Export failed: ${response.status} ${response.statusText}`);
+  let bytes: Uint8Array;
+
+  try {
+    bytes = await fetchPng(url, { maxBytes, timeoutMs });
+  } catch (error) {
+    throw new Error(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  const contentType = response.headers.get("content-type") ?? "";
-
-  if (!contentType.toLowerCase().includes("image/png")) {
-    throw new Error(`Export failed: expected image/png, received ${contentType || "unknown content type"}`);
-  }
-
-  const bytes = new Uint8Array(await response.arrayBuffer());
   await mkdir(dirname(out), { recursive: true });
   await writeFile(out, bytes);
   console.log(`Wrote ${bytes.byteLength} bytes to ${out}`);
@@ -46,24 +48,18 @@ async function exportImage(flags: Record<string, string | boolean>): Promise<voi
 
 async function checkImage(flags: Record<string, string | boolean>): Promise<void> {
   const url = requireString(flags, "url");
-  const maxBytes = Number(flags["max-bytes"] ?? 8_000_000);
-  const response = await fetch(url);
-  const contentType = response.headers.get("content-type") ?? "";
-  const bytes = new Uint8Array(await response.arrayBuffer());
+  const maxBytes = optionalPositiveInteger(flags, "max-bytes", DEFAULT_MAX_BYTES);
+  const timeoutMs = optionalPositiveInteger(flags, "timeout", DEFAULT_TIMEOUT_MS);
 
-  if (!response.ok) {
-    throw new Error(`Check failed: ${response.status} ${response.statusText}`);
+  let bytes: Uint8Array;
+
+  try {
+    bytes = await fetchPng(url, { maxBytes, timeoutMs });
+  } catch (error) {
+    throw new Error(`Check failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  if (!contentType.toLowerCase().includes("image/png")) {
-    throw new Error(`Check failed: expected image/png, received ${contentType || "unknown content type"}`);
-  }
-
-  if (bytes.byteLength > maxBytes) {
-    throw new Error(`Check failed: image is ${bytes.byteLength} bytes, above max ${maxBytes}`);
-  }
-
-  console.log(`OK ${response.status} ${contentType} ${bytes.byteLength} bytes`);
+  console.log(`OK 200 image/png ${bytes.byteLength} bytes`);
 }
 
 function preview(flags: Record<string, string | boolean>): void {
@@ -85,8 +81,10 @@ function help(): void {
   console.log(`og-route-kit
 
 Commands:
-  export --url <url> --out <path>       Fetch a PNG route and write it to disk
-  check --url <url> [--max-bytes <n>]   Verify a PNG route is healthy
+  export --url <url> --out <path> [--max-bytes <n>] [--timeout <ms>]
+                                        Fetch a PNG route and write it to disk
+  check --url <url> [--max-bytes <n>] [--timeout <ms>]
+                                        Verify a PNG route is healthy
   preview [--origin <url>] [--route <path>]
                                         Print local preview URLs
 `);
@@ -125,3 +123,29 @@ function requireString(flags: Record<string, string | boolean>, key: string): st
 
   return value;
 }
+
+function optionalPositiveInteger(
+  flags: Record<string, string | boolean>,
+  key: string,
+  fallback: number,
+): number {
+  const value = flags[key];
+
+  if (value === undefined) {
+    return fallback;
+  }
+
+  if (typeof value !== "string") {
+    throw new Error(`Flag --${key} requires a positive integer`);
+  }
+
+  const parsed = Number(value);
+
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+    throw new Error(`Flag --${key} requires a positive integer`);
+  }
+
+  return parsed;
+}
+
+await main();
