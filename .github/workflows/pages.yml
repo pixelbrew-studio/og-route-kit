@@ -1,0 +1,70 @@
+name: Demo (GitHub Pages)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.33.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package and example app
+        run: |
+          pnpm build
+          pnpm example:build
+
+      - name: Start example server
+        run: |
+          pnpm --filter og-route-kit-next-app-example start &
+          npx --yes wait-on http://localhost:3000 --timeout 60000
+
+      - name: Render demo images with the kit CLI
+        run: |
+          base="http://localhost:3000/api/og"
+          node dist/cli/index.js export --url "$base/product"   --out demo/images/product.png
+          node dist/cli/index.js export --url "$base/article"   --out demo/images/article.png
+          node dist/cli/index.js export --url "$base/changelog" --out demo/images/changelog.png
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
