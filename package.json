@@ -80,5 +80,10 @@
     "tsup": "^8.5.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss@<8.5.10": ">=8.5.10"
+    }
   }
 }

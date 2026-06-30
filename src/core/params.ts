@@ -11,6 +11,11 @@ export type NormalizeOgParamsOptions<T extends Record<string, string>> = {
   fields?: OgFields<T> | undefined;
 };
 
+// Caps untrusted query input that reaches the renderer when a field omits an
+// explicit max, so an unconfigured field can't accept multi-megabyte values.
+// Override per field with `fields[key].max`.
+export const DEFAULT_OG_PARAM_MAX = 512;
+
 export class OgParamError extends Error {
   constructor(message: string) {
     super(message);
@@ -58,7 +63,7 @@ export function normalizeOgParams<T extends Record<string, string>>(
 }
 
 function applyMax(value: string, max: number | undefined): string {
-  return typeof max === "number" ? value.slice(0, max) : value;
+  return value.slice(0, typeof max === "number" ? max : DEFAULT_OG_PARAM_MAX);
 }
 
 function toURLSearchParams(input: OgSearchParamsInput): URLSearchParams {

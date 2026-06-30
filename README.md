@@ -160,6 +160,8 @@ Builds Open Graph and Twitter metadata for website and article pages.
 import { createSocialMetadata } from "og-route-kit/next";
 ```
 
+Metadata inputs (`title`, `description`, `path`, `image`) are treated as trusted page configuration. A `path` or image value that is a full `http(s)` URL is used verbatim, so do not pass raw end-user input into these fields, or `canonical` and `og:url` could point off-origin.
+
 ### `normalizeOgParams`
 
 Framework-independent field normalization:
@@ -167,7 +169,7 @@ Framework-independent field normalization:
 - missing, empty, and whitespace-only values use a field fallback or default
 - whitespace collapses by default
 - strings trim before validation
-- `max` truncates deterministically
+- `max` truncates deterministically; fields without a `max` are still capped at `DEFAULT_OG_PARAM_MAX` (512) so untrusted query input cannot reach the renderer unbounded
 - required fields fail clearly when no usable value exists
 
 ```ts
