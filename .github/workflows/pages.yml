@@ -44,7 +44,12 @@ jobs:
       - name: Start example server
         run: |
           pnpm --filter og-route-kit-next-app-example start &
-          npx --yes wait-on http://localhost:3000 --timeout 60000
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:3000 >/dev/null && exit 0
+            sleep 1
+          done
+          echo "example server did not start within 60s" >&2
+          exit 1
 
       - name: Render demo images with the kit CLI
         run: |

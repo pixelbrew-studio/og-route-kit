@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildOgImageUrl, normalizeOgParams, OgParamError, resolveOgImageSize } from "../src/core/index.js";
+import { buildOgImageUrl, DEFAULT_OG_PARAM_MAX, normalizeOgParams, OgParamError, resolveOgImageSize } from "../src/core/index.js";
 
 describe("normalizeOgParams", () => {
   it("uses defaults for missing, empty, and whitespace-only values", () => {
@@ -58,6 +58,15 @@ describe("normalizeOgParams", () => {
       title: "abc",
       description: "fall",
     });
+  });
+
+  it("caps a field with no explicit max at the default to bound renderer input", () => {
+    const oversized = "a".repeat(DEFAULT_OG_PARAM_MAX + 100);
+    const params = normalizeOgParams(new URLSearchParams(`title=${oversized}`), {
+      defaults: { title: "Default title" },
+    });
+
+    expect(params.title).toHaveLength(DEFAULT_OG_PARAM_MAX);
   });
 
   it("preserves decoded punctuation", () => {
