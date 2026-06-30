@@ -3,6 +3,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
 import { DEFAULT_MAX_BYTES, DEFAULT_TIMEOUT_MS, fetchPng } from "./fetch-png.js";
+import { buildPreviewUrls, optionalPositiveInteger, parseFlags, requireString } from "./args.js";
+import type { Flags } from "./args.js";
 
 type Command = "export" | "check" | "preview" | "help";
 
@@ -27,7 +29,7 @@ async function main(): Promise<void> {
   }
 }
 
-async function exportImage(flags: Record<string, string | boolean>): Promise<void> {
+async function exportImage(flags: Flags): Promise<void> {
   const url = requireString(flags, "url");
   const out = requireString(flags, "out");
   const maxBytes = optionalPositiveInteger(flags, "max-bytes", DEFAULT_MAX_BYTES);
@@ -46,7 +48,7 @@ async function exportImage(flags: Record<string, string | boolean>): Promise<voi
   console.log(`Wrote ${bytes.byteLength} bytes to ${out}`);
 }
 
-async function checkImage(flags: Record<string, string | boolean>): Promise<void> {
+async function checkImage(flags: Flags): Promise<void> {
   const url = requireString(flags, "url");
   const maxBytes = optionalPositiveInteger(flags, "max-bytes", DEFAULT_MAX_BYTES);
   const timeoutMs = optionalPositiveInteger(flags, "timeout", DEFAULT_TIMEOUT_MS);
@@ -62,18 +64,9 @@ async function checkImage(flags: Record<string, string | boolean>): Promise<void
   console.log(`OK 200 image/png ${bytes.byteLength} bytes`);
 }
 
-function preview(flags: Record<string, string | boolean>): void {
-  const origin = String(flags.origin ?? "http://localhost:3000").replace(/\/+$/, "");
-  const route = String(flags.route ?? "/api/og");
-  const base = `${origin}${route.startsWith("/") ? route : `/${route}`}`;
-  const examples = [
-    ["Product", "eyebrow=Product&title=Ship+better+social+cards.&description=Code-rendered+Open+Graph+images."],
-    ["Article", "eyebrow=Journal&title=Why+coded+OG+routes+beat+exported+PNGs&description=Typed+routes+stay+fresh."],
-    ["Changelog", "eyebrow=v0.1.0&title=Initial+route+kit+release&description=Params%2C+metadata%2C+export."],
-  ];
-
-  for (const [label, query] of examples) {
-    console.log(`${label}: ${base}?${query}`);
+function preview(flags: Flags): void {
+  for (const line of buildPreviewUrls(flags)) {
+    console.log(line);
   }
 }
 
@@ -88,64 +81,6 @@ Commands:
   preview [--origin <url>] [--route <path>]
                                         Print local preview URLs
 `);
-}
-
-function parseFlags(values: string[]): Record<string, string | boolean> {
-  const flags: Record<string, string | boolean> = {};
-
-  for (let index = 0; index < values.length; index += 1) {
-    const token = values[index];
-
-    if (!token?.startsWith("--")) {
-      continue;
-    }
-
-    const key = token.slice(2);
-    const next = values[index + 1];
-
-    if (next && !next.startsWith("--")) {
-      flags[key] = next;
-      index += 1;
-    } else {
-      flags[key] = true;
-    }
-  }
-
-  return flags;
-}
-
-function requireString(flags: Record<string, string | boolean>, key: string): string {
-  const value = flags[key];
-
-  if (typeof value !== "string" || value.length === 0) {
-    throw new Error(`Missing required flag --${key}`);
-  }
-
-  return value;
-}
-
-function optionalPositiveInteger(
-  flags: Record<string, string | boolean>,
-  key: string,
-  fallback: number,
-): number {
-  const value = flags[key];
-
-  if (value === undefined) {
-    return fallback;
-  }
-
-  if (typeof value !== "string") {
-    throw new Error(`Flag --${key} requires a positive integer`);
-  }
-
-  const parsed = Number(value);
-
-  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
-    throw new Error(`Flag --${key} requires a positive integer`);
-  }
-
-  return parsed;
 }
 
 await main();
