@@ -47,7 +47,7 @@ export function normalizeOgParams<T extends Record<string, string>>(
 
     const normalizedFallback = normalizeText(fallback, {
       collapseWhitespace: field?.collapseWhitespace,
-      max: field?.max,
+      max: resolveMax(field?.max),
     });
 
     if (normalizedFallback.length > 0) {

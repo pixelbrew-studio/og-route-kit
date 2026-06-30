@@ -45,6 +45,7 @@ export function createOgRoute<T extends Record<string, string>>(options: CreateO
       ...size,
       headers: {
         "Cache-Control": DEFAULT_CACHE_CONTROL,
+        "X-Content-Type-Options": "nosniff",
         ...headersToRecord(options.headers),
       },
     });
