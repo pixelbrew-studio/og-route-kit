@@ -56,7 +56,7 @@ Runtime peer dependencies:
 pnpm add next react
 ```
 
-`og-route-kit` expects Node.js 20 or newer.
+`og-route-kit` expects Node.js 20 or newer. The package supports Next.js 14 and newer, so its engine is intentionally not tightened to the Next.js 16 floor. The included Next.js 16 example requires Node.js 20.9.0 or newer.
 
 ## Quickstart
 
@@ -98,6 +98,7 @@ export const social = createSocialMetadata({
   twitter: "@acme",
   imageRoute: "/api/og",
   defaultImage: "/og-image.png",
+  includeDefaultImageFallback: true,
 });
 ```
 
@@ -117,6 +118,30 @@ export const metadata: Metadata = social.website({
     description: "Start small. Scale when needed.",
   },
 });
+```
+
+`defaultImage` is used when a page does not pass `image` params. It is not, by itself, a backup for a dynamic route that fails after a page has emitted `/api/og?...`. Set `includeDefaultImageFallback: true` to emit both images when page-specific image params are present: the generated route image first, then `defaultImage` second. Twitter metadata stays a string URL list in the same order.
+
+A production setup can keep committed PNGs in `public/` and list one as the static fallback:
+
+```ts
+// lib/social.ts
+import { createSocialMetadata } from "og-route-kit/next";
+
+export const social = createSocialMetadata({
+  siteUrl: "https://pixelbrew.example",
+  siteName: "Pixelbrew",
+  twitter: "@pixelbrew",
+  imageRoute: "/api/og",
+  defaultImage: "/og/default.png",
+  includeDefaultImageFallback: true,
+});
+```
+
+```bash
+pnpm exec og-route-kit export \
+  --url "http://localhost:3000/api/og?title=Pixelbrew&description=Landing+page" \
+  --out public/og/default.png
 ```
 
 ## CLI
@@ -165,6 +190,8 @@ import { createSocialMetadata } from "og-route-kit/next";
 ```
 
 Metadata inputs (`title`, `description`, `path`, `image`) are treated as trusted page configuration. A `path` or image value that is a full `http(s)` URL is used verbatim, so do not pass raw end-user input into these fields, or `canonical` and `og:url` could point off-origin.
+
+`defaultImage` is a default for pages that omit `image`; it does not automatically back up failed dynamic image routes. To list a committed PNG after the dynamic route image, set `includeDefaultImageFallback: true` and keep `defaultImage` pointed at the static asset.
 
 ### `normalizeOgParams`
 

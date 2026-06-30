@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import { createSocialMetadata } from "../src/next/index.js";
 
 describe("createSocialMetadata", () => {
+  const pricingRouteImage =
+    "https://acme.com/api/og?eyebrow=Pricing&title=Usage-based+pricing.&description=Start+small.+Scale+when+needed.";
   const social = createSocialMetadata({
     siteUrl: "https://acme.com/",
     siteName: "Acme",
@@ -30,7 +32,7 @@ describe("createSocialMetadata", () => {
       siteName: "Acme",
       images: [
         {
-          url: "https://acme.com/api/og?eyebrow=Pricing&title=Usage-based+pricing.&description=Start+small.+Scale+when+needed.",
+          url: pricingRouteImage,
           alt: "Pricing social card",
           width: 1200,
           height: 630,
@@ -40,13 +42,11 @@ describe("createSocialMetadata", () => {
     expect(metadata.twitter).toMatchObject({
       card: "summary_large_image",
       site: "@acme",
-      images: [
-        "https://acme.com/api/og?eyebrow=Pricing&title=Usage-based+pricing.&description=Start+small.+Scale+when+needed.",
-      ],
+      images: [pricingRouteImage],
     });
   });
 
-  it("uses the static fallback image when no image params are supplied", () => {
+  it("uses defaultImage when no image params are supplied", () => {
     const metadata = social.website({
       title: "Home",
       description: "Home page.",
@@ -61,6 +61,55 @@ describe("createSocialMetadata", () => {
           height: 630,
         },
       ],
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: ["https://acme.com/og-image.png"],
+    });
+  });
+
+  it("emits the route image first and defaultImage second when fallback output is enabled", () => {
+    const socialWithFallback = createSocialMetadata({
+      siteUrl: "https://acme.com/",
+      siteName: "Acme",
+      twitter: "@acme",
+      imageRoute: "/api/og",
+      defaultImage: "/og-image.png",
+      includeDefaultImageFallback: true,
+    });
+
+    const metadata = socialWithFallback.website({
+      title: "Pricing",
+      description: "Simple usage-based pricing.",
+      path: "/pricing",
+      imageAlt: "Pricing social card",
+      image: {
+        eyebrow: "Pricing",
+        title: "Usage-based pricing.",
+        description: "Start small. Scale when needed.",
+      },
+    });
+
+    expect(metadata.openGraph).toMatchObject({
+      images: [
+        {
+          url: pricingRouteImage,
+          alt: "Pricing social card",
+          width: 1200,
+          height: 630,
+        },
+        {
+          url: "https://acme.com/og-image.png",
+          alt: "Pricing social card",
+          width: 1200,
+          height: 630,
+        },
+      ],
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      site: "@acme",
+      images: [pricingRouteImage, "https://acme.com/og-image.png"],
     });
   });
 

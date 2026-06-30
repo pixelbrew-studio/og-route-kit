@@ -2,6 +2,8 @@
 
 This example exercises the package from a real Next App Router route.
 
+This example uses Next.js 16 and requires Node.js 20.9.0 or newer.
+
 ```bash
 pnpm install
 pnpm build
