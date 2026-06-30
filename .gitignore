@@ -3,5 +3,6 @@ dist/
 .next/
 examples/next-app/.next/
 .context/
+demo/images/
 *.tsbuildinfo
 .DS_Store
