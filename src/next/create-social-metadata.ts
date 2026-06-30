@@ -9,6 +9,7 @@ export type CreateSocialMetadataOptions = {
   twitter?: string | undefined;
   imageRoute: string;
   defaultImage?: string | undefined;
+  includeDefaultImageFallback?: boolean | undefined;
   imageSize?: OgImageSizeInput | undefined;
   defaultImageSize?: OgImageSizeInput | undefined;
 };
@@ -47,7 +48,7 @@ function buildMetadata(
   input: WebsiteMetadataInput | ArticleMetadataInput,
 ): Metadata {
   const pageUrl = absoluteUrl(siteUrl, input.path ?? "/");
-  const image = resolveSocialImage(siteUrl, options, input);
+  const images = resolveSocialImages(siteUrl, options, input);
   const title = input.title;
   const description = input.description;
 
@@ -64,7 +65,7 @@ function buildMetadata(
       title,
       description,
       siteName: options.siteName,
-      images: [image],
+      images,
       ...(type === "article" ? articleFields(input as ArticleMetadataInput) : {}),
     },
     twitter: {
@@ -72,43 +73,61 @@ function buildMetadata(
       site: options.twitter,
       title,
       description,
-      images: [image.url],
+      images: images.map((image) => image.url),
     },
   };
 }
 
-function resolveSocialImage(
+type SocialImageMetadata = {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+function resolveSocialImages(
   siteUrl: string,
   options: CreateSocialMetadataOptions,
   input: WebsiteMetadataInput,
-): { url: string; alt: string; width: number; height: number } {
+): SocialImageMetadata[] {
   const imageSize = resolveOgImageSize(options.imageSize ?? "og");
   const fallbackSize = resolveOgImageSize(options.defaultImageSize ?? options.imageSize ?? "og");
   const alt = input.imageAlt ?? input.title;
+  const defaultImage = options.defaultImage
+    ? {
+        url: absoluteUrl(siteUrl, options.defaultImage),
+        alt,
+        ...fallbackSize,
+      }
+    : undefined;
 
   if (input.image) {
     const url = absoluteUrl(siteUrl, buildOgImageUrl(options.imageRoute, input.image));
-
-    return {
+    const routeImage = {
       url,
       alt,
       ...imageSize,
     };
+
+    return options.includeDefaultImageFallback && defaultImage
+      ? [routeImage, defaultImage]
+      : [routeImage];
   }
 
-  if (options.defaultImage) {
-    return {
-      url: absoluteUrl(siteUrl, options.defaultImage),
+  if (defaultImage) {
+    return [defaultImage];
+  }
+
+  return [
+    {
+      url: absoluteUrl(
+        siteUrl,
+        buildOgImageUrl(options.imageRoute, { title: input.title, description: input.description }),
+      ),
       alt,
-      ...fallbackSize,
-    };
-  }
-
-  return {
-    url: absoluteUrl(siteUrl, buildOgImageUrl(options.imageRoute, { title: input.title, description: input.description })),
-    alt,
-    ...imageSize,
-  };
+      ...imageSize,
+    },
+  ];
 }
 
 function articleFields(input: ArticleMetadataInput): Record<string, unknown> {
