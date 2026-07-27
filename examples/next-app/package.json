@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "^16.2.9",
+    "next": "^16.2.12",
     "og-route-kit": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
