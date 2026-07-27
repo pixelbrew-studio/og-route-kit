@@ -10,7 +10,7 @@
   "dependencies": {
     "next": "^16.2.9",
     "og-route-kit": "workspace:*",
-    "react": "^19.1.0",
+    "react": "^19.2.8",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
