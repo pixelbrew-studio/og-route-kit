@@ -10,12 +10,12 @@
   "dependencies": {
     "next": "^16.2.9",
     "og-route-kit": "workspace:*",
-    "react": "^19.1.0",
+    "react": "^19.3.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
-    "@types/react": "^19.1.8",
+    "@types/react": "^19.3.0",
     "typescript": "^6.0.3"
   }
 }
